@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="ru" data-title="title_dash">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="description" content="Minecraft server worlds dashboard">
+  <title>Worlds · Minecraft Dashboard</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="stage">
+    <header class="topbar">
+      <span class="brand-mini">Minecraft</span>
+      <div class="top-right">
+        <span id="server-status" class="pill">…</span>
+        <button id="admin-panel-btn" class="ghost hidden" type="button" data-i18n="admin_btn">⚙️ Settings</button>
+        <a id="console-btn" href="/console" class="ghost hidden" data-i18n="console_btn">💻 Console</a>
+        <button id="how-to-connect-btn" class="ghost how-btn" type="button" data-i18n="how_to_connect_short">🎮 Connect</button>
+        <button class="ghost" type="button" data-lang-toggle aria-label="Language">EN</button>
+        <button id="logout-btn" class="ghost" type="button" data-i18n="logout">Log out</button>
+      </div>
+    </header>
+    <section class="hero">
+      <p class="eyebrow" data-i18n="eyebrow">Minecraft Server</p>
+      <h1 data-i18n="hero_h">All your worlds in one place</h1>
+      <p class="sub" data-i18n="hero_sub">Server worlds, player access and status — behind one lock.</p>
+      <div class="hero-actions">
+        <a id="scroll-btn" class="cta" href="#worlds-section"><span data-i18n="open_worlds">View worlds</span> <span aria-hidden="true">↓</span></a>
+        <button id="hero-connect-btn" class="mc-btn ghost" type="button" data-i18n="how_to_connect">🎮 How to connect</button>
+        <a id="hero-console-btn" class="mc-btn ghost" href="/console" data-i18n="console_btn">💻 Console</a>
+      </div>
+    </section>
+  </div>
+
+  <main id="worlds-section">
+    <h2 class="section-title" data-i18n="worlds">Worlds</h2>
+    <section class="players-bar" aria-label="Online">
+      <span data-i18n="online">Online:</span>
+      <div id="players" class="chips"></div>
+    </section>
+    <section id="worlds" class="grid" aria-live="polite"></section>
+    
+    <div class="dash-footer-connect">
+      <button id="how-to-connect-bottom-btn" type="button" class="mc-btn cta" data-i18n="how_to_connect">🎮 How to connect to server</button>
+    </div>
+
+    <p id="updated" class="foot"></p>
+  </main>
+
+  <!-- How to Connect Modal -->
+  <div id="connect-modal" class="modal-backdrop hidden" aria-hidden="true" role="dialog">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 data-i18n="connect_title">🎮 How to connect to server</h2>
+        <button id="modal-close" class="modal-close-btn" type="button">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-intro" data-i18n="connect_intro">Join our private Minecraft world directly from your Minecraft Java client:</p>
+        
+        <div class="connect-info-block">
+          <label class="info-label" data-i18n="server_addr">Server Address:</label>
+          <div class="copy-box">
+            <code id="server-ip-code">mc.dosimple.app</code>
+            <button id="copy-ip-btn" class="mc-btn small" type="button" data-i18n="copy_btn">📋 Copy</button>
+          </div>
+          <span id="copy-status" class="copy-status"></span>
+        </div>
+
+        <div class="connect-details-grid">
+          <div class="detail-item">
+            <span class="detail-name" data-i18n="port_label">Port:</span>
+            <span class="detail-val">25565 (Default)</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-name" data-i18n="direct_ip_label">Direct IP:</span>
+            <span class="detail-val">91.99.147.9:25565</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-name" data-i18n="version_label">Game Version:</span>
+            <span class="detail-val">Java Edition 1.16.5</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-name" data-i18n="prot_label">Protection:</span>
+            <span class="detail-val">Whitelist &amp; AuthMe</span>
+          </div>
+        </div>
+
+        <div class="connect-steps">
+          <h3 data-i18n="steps_heading">Quick Steps:</h3>
+          <ol>
+            <li data-i18n="step_1">Launch <strong>Minecraft Java Edition 1.16.5</strong>.</li>
+            <li data-i18n="step_2">Click <strong>Multiplayer</strong> &rarr; <strong>Direct Connection</strong> (or <strong>Add Server</strong>).</li>
+            <li data-i18n="step_3">Enter <code class="inline-code">mc.dosimple.app</code> into the server address.</li>
+            <li data-i18n="step_4">Click <strong>Join Server</strong>!</li>
+          </ol>
+          <p class="whitelist-note" data-i18n="whitelist_warn">⚠️ <em>Note:</em> Server whitelist is strictly enforced. If you are not yet on the whitelist, contact an admin.</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="modal-done" class="mc-btn cta" type="button" data-i18n="got_it">Got it! / Понятно</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Settings Modal -->
+  <div id="admin-modal" class="modal-backdrop hidden" aria-hidden="true" role="dialog">
+    <div class="modal-box admin-modal-box">
+      <div class="modal-header">
+        <h2 data-i18n="admin_panel_title">⚙️ Admin Control &amp; Settings</h2>
+        <button id="admin-modal-close" class="modal-close-btn" type="button">✕</button>
+      </div>
+      
+      <div class="admin-tabs">
+        <button class="admin-tab active" data-tab="tab-invites" type="button" data-i18n="tab_invites">🔗 Invites</button>
+        <button class="admin-tab" data-tab="tab-security" type="button" data-i18n="tab_security">🔐 2FA &amp; Security</button>
+        <button class="admin-tab" data-tab="tab-users" type="button" data-i18n="tab_users">👥 Users</button>
+        <button class="admin-tab" data-tab="tab-whitelist" type="button" data-i18n="tab_whitelist">📜 Whitelist</button>
+      </div>
+
+      <div class="modal-body admin-tab-content">
+        <!-- Tab 1: Invites -->
+        <section id="tab-invites" class="tab-pane active">
+          <div class="admin-section-box">
+            <h3 data-i18n="create_invite_h">Create Self-Registration Link</h3>
+            <p class="muted" data-i18n="create_invite_sub">Generate a link allowing a user to register an account with a specific role.</p>
+            <div class="invite-form-row">
+              <div class="input-col">
+                <label for="invite-role" data-i18n="account_role">Account Role:</label>
+                <select id="invite-role" class="mc-input">
+                  <option value="player">Player (Обычный игрок)</option>
+                  <option value="admin">Admin (Администратор)</option>
+                </select>
+              </div>
+              <div class="input-col">
+                <label for="invite-uses" data-i18n="max_uses">Max Uses:</label>
+                <select id="invite-uses" class="mc-input">
+                  <option value="1">1 use (Одноразовая)</option>
+                  <option value="5">5 uses</option>
+                  <option value="0">Unlimited (Бессрочная)</option>
+                </select>
+              </div>
+              <button id="gen-invite-btn" class="mc-btn cta" type="button" data-i18n="gen_link_btn">Generate Link ↵</button>
+            </div>
+            <div id="new-invite-box" class="new-invite-result hidden">
+              <span class="invite-success-label" data-i18n="link_ready">Link Ready:</span>
+              <div class="copy-box">
+                <code id="new-invite-link">...</code>
+                <button id="copy-invite-btn" class="mc-btn small" type="button" data-i18n="copy_btn">📋 Copy</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="admin-section-box">
+            <h3 data-i18n="active_invites_h">Active Invite Links</h3>
+            <div class="table-wrap">
+              <table class="mc-table">
+                <thead>
+                  <tr>
+                    <th>Role</th>
+                    <th>Code</th>
+                    <th>Uses</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="invites-tbody">
+                  <tr><td colspan="4" class="muted">Loading invites...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 2: Security & 2FA -->
+        <section id="tab-security" class="tab-pane">
+          <div class="admin-section-box">
+            <h3 data-i18n="open_reg_h">Open Registration (Without Invite)</h3>
+            <p class="muted" data-i18n="open_reg_sub">If enabled, anyone can visit /register and create a player account without needing an invite link.</p>
+            <div class="toggle-row">
+              <span id="open-reg-status" class="pill">...</span>
+              <button id="toggle-open-reg-btn" class="mc-btn" type="button">Toggle</button>
+            </div>
+          </div>
+
+          <div class="admin-section-box">
+            <h3 data-i18n="admin_2fa_h">Admin Two-Factor Authentication (2FA)</h3>
+            <p class="muted" data-i18n="admin_2fa_sub">Protect your admin account using Google Authenticator, 1Password or Authy (TOTP).</p>
+            
+            <div id="2fa-status-block" class="toggle-row">
+              <span>Status: <strong id="2fa-status-text">...</strong></span>
+              <button id="2fa-action-btn" class="mc-btn" type="button">Setup 2FA</button>
+            </div>
+
+            <div id="2fa-setup-box" class="twofa-setup-area hidden">
+              <div class="step-box">
+                <p>1. Add this key to your Authenticator App:</p>
+                <div class="copy-box">
+                  <code id="2fa-secret-code">...</code>
+                  <button id="copy-secret-btn" class="mc-btn small" type="button">📋 Copy Key</button>
+                </div>
+                <p class="muted" style="margin-top: 6px;">Or open with app: <a id="2fa-otp-link" href="#" class="text-link">Open in Authenticator</a></p>
+              </div>
+
+              <div class="step-box">
+                <p>2. Enter 6-digit verification code from app:</p>
+                <div class="verify-row">
+                  <input id="2fa-verify-code" type="text" maxlength="6" placeholder="123456" class="mc-input verify-input" pattern="[0-9]{6}">
+                  <button id="2fa-confirm-btn" class="mc-btn cta" type="button">Verify &amp; Enable</button>
+                </div>
+                <span id="2fa-verify-err" class="err-text"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="admin-section-box">
+            <h3 data-i18n="guest_link_h">Guest Link (Public Worlds &amp; Read-Only Console)</h3>
+            <p class="muted" data-i18n="guest_link_sub">Anyone with this link can view all public server worlds and access live read-only server console without logging in.</p>
+            <div class="copy-box" style="margin-top: 10px;">
+              <code id="guest-view-link">...</code>
+              <button id="copy-guest-link-btn" class="mc-btn small" type="button" data-i18n="copy_btn">📋 Copy</button>
+              <button id="regen-guest-link-btn" class="mc-btn small err-btn" type="button" data-i18n="regen_console_key">🔄 Regenerate Key</button>
+            </div>
+            <span id="guest-link-status" class="copy-status"></span>
+          </div>
+
+          <div class="admin-section-box">
+            <h3 data-i18n="console_link_h">Direct Read-Only Console Link</h3>
+            <p class="muted" data-i18n="console_link_sub">Live console viewing link without login. No credentials required, commands are blocked.</p>
+            <div class="copy-box" style="margin-top: 10px;">
+              <code id="console-view-link">...</code>
+              <button id="copy-console-link-btn" class="mc-btn small" type="button" data-i18n="copy_btn">📋 Copy</button>
+              <button id="regen-console-link-btn" class="mc-btn small err-btn" type="button" data-i18n="regen_console_key">🔄 Regenerate Key</button>
+            </div>
+            <span id="console-link-status" class="copy-status"></span>
+          </div>
+        </section>
+
+        <!-- Tab 3: Users -->
+        <section id="tab-users" class="tab-pane">
+          <div class="admin-section-box">
+            <h3 data-i18n="users_list_h">Registered Dashboard Users</h3>
+            <div class="table-wrap">
+              <table class="mc-table">
+                <thead>
+                  <tr>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>2FA</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="users-tbody">
+                  <tr><td colspan="4" class="muted">Loading users...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 4: Whitelist -->
+        <section id="tab-whitelist" class="tab-pane">
+          <div class="admin-section-box">
+            <h3 data-i18n="wl_mgmt_h">Minecraft Server Whitelist</h3>
+            <p class="muted" data-i18n="wl_mgmt_sub">Manage player whitelist in real time via server RCON.</p>
+            <div class="invite-form-row">
+              <input id="wl-add-nick" type="text" placeholder="Player Nickname..." class="mc-input">
+              <button id="wl-add-btn" class="mc-btn cta" type="button">Add to Whitelist ↵</button>
+            </div>
+            <div class="table-wrap" style="margin-top: 14px;">
+              <table class="mc-table">
+                <thead>
+                  <tr>
+                    <th>Player Nickname</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="wl-tbody">
+                  <tr><td colspan="2" class="muted">Loading whitelist...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="modal-footer">
+        <a href="/console" class="mc-btn ghost" target="_blank">💻 Open Live Console</a>
+        <button id="admin-modal-done" class="mc-btn cta" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/i18n.js" defer></script>
+  <script src="/static/app.js" defer></script>
+</body>
+</html>

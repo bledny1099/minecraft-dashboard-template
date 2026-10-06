@@ -1,0 +1,20 @@
+[Unit]
+Description=Minecraft Worlds Dashboard & Live Console
+After=network.target
+
+[Service]
+Type=simple
+User=minecraft
+Group=minecraft
+WorkingDirectory=/opt/minecraft-dashboard
+EnvironmentFile=/opt/minecraft-dashboard/.env
+ExecStart=/usr/bin/python3 /opt/minecraft-dashboard/server.py
+Restart=always
+RestartSec=5s
+
+# Security hardening
+ProtectSystem=full
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

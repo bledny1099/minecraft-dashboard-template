@@ -1,0 +1,366 @@
+@font-face {
+  font-family: 'Minecraft';
+  src: url('/static/minecraft.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Monocraft: шрифт в стиле Minecraft с латиницей и кириллицей — EN и RU одного размера */
+  --mc-font: 'Minecraft', 'Courier New', monospace;
+  --text: #ffffff;
+  --text-muted: #c6c6c6;
+  --text-yellow: #ffff55;
+  --text-hover: #ffffa0;
+  --text-link: #7dffff;
+  --btn-bg: #737373;
+  --btn-hover: #8b8b8b;
+  --btn-active: #555555;
+  --red: #ff6b6b;
+  --green: #66ff66;
+}
+
+* { box-sizing: border-box; }
+html { background: #2b1f16; scroll-behavior: smooth; }
+body {
+  margin: 0; min-height: 100vh; font-family: var(--mc-font); font-size: 16px; font-weight: normal;
+  color: var(--text); line-height: 1.5;
+  -webkit-font-smoothing: none; font-smooth: never; text-rendering: optimizeSpeed;
+  /* фон как в меню Minecraft: повторяющиеся блоки земли, чёткие пиксели */
+  background: #2b1f16 url('/static/dirt.png') top left / 96px 96px repeat;
+  image-rendering: pixelated;
+}
+
+#sphere { display: none !important; }
+
+.stage {
+  position: relative; display: flex; flex-direction: column; min-height: 100vh; margin: 0;
+  background: transparent;
+}
+.login-stage { align-items: center; justify-content: center; }
+
+/* ── карточка логина ── */
+.login-card {
+  width: min(480px, calc(100% - 32px)); margin: auto; padding: 32px 30px 28px;
+  text-align: center; border-radius: 0;
+  background: #1c1c1c;
+  border: 2px solid #000000;
+  box-shadow: inset 2px 2px 0 #5a5a5a, inset -2px -2px 0 #262626;
+  color: var(--text);
+}
+.login-card .eyebrow {
+  margin: 0 0 10px; color: var(--text-yellow); font-size: 16px; text-shadow: 2px 2px 0 #3f3f15;
+}
+.login-card h1 {
+  margin: 0 0 10px; font-size: 32px; line-height: 1.15; font-weight: normal; color: #ffffff;
+  text-shadow: 3px 3px 0 #3f3f3f;
+}
+.login-card .muted { color: var(--text-muted); font-size: 16px; margin: 0 0 8px; text-shadow: 2px 2px 0 #2a2a2a; }
+
+/* ── поля ввода ── */
+.login-card form { text-align: left; margin-top: 20px; display: grid; gap: 14px; }
+.login-card label { font-size: 16px; color: #e0e0e0; display: block; margin-bottom: 6px; text-shadow: 2px 2px 0 #3f3f3f; }
+.login-card input {
+  width: 100%; padding: 10px 12px; border-radius: 0;
+  background: #000000; border: 2px solid #a0a0a0;
+  box-shadow: inset 2px 2px 0 #000000; color: #ffffff;
+  font-family: var(--mc-font); font-size: 16px; text-shadow: 2px 2px 0 #3f3f3f; outline: none;
+}
+.login-card input:focus { border-color: #ffffff; }
+
+/* ── кнопки Minecraft ── */
+.cta, button.cta {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; padding: 12px 16px; cursor: pointer; margin-top: 8px;
+  font-family: var(--mc-font); font-size: 16px; text-decoration: none; border-radius: 0;
+  background: var(--btn-bg);
+  border-top: 2px solid #bebebe; border-left: 2px solid #bebebe;
+  border-right: 2px solid #373737; border-bottom: 2px solid #373737;
+  box-shadow: inset 2px 2px 0 #ffffff, inset -2px -2px 0 #555555, 0 0 0 2px #000000;
+  color: #ffffff; text-shadow: 2px 2px 0 #3f3f3f;
+}
+.cta:hover, button.cta:hover {
+  background: var(--btn-hover);
+  border-top-color: #ffffff; border-left-color: #ffffff;
+  border-right-color: #4a4a4a; border-bottom-color: #4a4a4a;
+  box-shadow: inset 2px 2px 0 #ffffff, inset -2px -2px 0 #6b6b6b, 0 0 0 2px #ffffff;
+  color: var(--text-hover); text-shadow: 2px 2px 0 #3f3f20;
+}
+.cta:active, button.cta:active {
+  background: var(--btn-active);
+  border-top-color: #373737; border-left-color: #373737;
+  border-right-color: #bebebe; border-bottom-color: #bebebe;
+  box-shadow: inset 2px 2px 0 #222222, 0 0 0 2px #000000;
+}
+
+button.ghost {
+  font-family: var(--mc-font); font-size: 16px; cursor: pointer; color: #ffffff; background: var(--btn-bg);
+  border-top: 2px solid #bebebe; border-left: 2px solid #bebebe;
+  border-right: 2px solid #373737; border-bottom: 2px solid #373737;
+  box-shadow: inset 1px 1px 0 #ffffff, inset -1px -1px 0 #555555, 0 0 0 2px #000000;
+  padding: 6px 14px; border-radius: 0; text-shadow: 2px 2px 0 #3f3f3f;
+}
+button.ghost:hover {
+  background: var(--btn-hover); color: var(--text-hover);
+  box-shadow: inset 1px 1px 0 #ffffff, inset -1px -1px 0 #6b6b6b, 0 0 0 2px #ffffff;
+}
+.lang-float { position: absolute; top: 18px; right: clamp(18px, 4vw, 32px); z-index: 2; }
+
+.login-footer { margin-top: 18px; display: flex; justify-content: center; }
+.text-link {
+  background: none; border: none; font-family: var(--mc-font); font-size: 16px;
+  color: var(--text-link); cursor: pointer; text-shadow: 2px 2px 0 #153f3f;
+  text-decoration: underline; text-underline-offset: 4px; padding: 4px;
+}
+.text-link:hover { color: #ffffff; text-shadow: 2px 2px 0 #3f3f3f; }
+
+.admin-notice {
+  margin-top: 16px; padding: 12px 14px; border-radius: 0; background: #000000;
+  border: 2px solid #ffffff; box-shadow: 0 0 0 2px #000000; text-align: left;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.admin-notice.hidden { display: none !important; }
+.admin-notice-content { display: flex; align-items: flex-start; gap: 8px; }
+.admin-notice-text { margin: 0; font-size: 16px; line-height: 1.5; color: #ffffff; text-shadow: 2px 2px 0 #3f3f3f; }
+.btn-subtle {
+  align-self: flex-end; background: var(--btn-bg);
+  border-top: 2px solid #bebebe; border-left: 2px solid #bebebe;
+  border-right: 2px solid #373737; border-bottom: 2px solid #373737;
+  box-shadow: 0 0 0 2px #000000; color: #ffffff; text-shadow: 2px 2px 0 #3f3f3f;
+  font-family: var(--mc-font); font-size: 16px; padding: 4px 14px; cursor: pointer; border-radius: 0;
+}
+.btn-subtle:hover { background: var(--btn-hover); color: var(--text-hover); }
+
+.err {
+  margin: 12px 0 0; padding: 10px 12px; border-radius: 0; color: var(--red); background: #000000;
+  border: 2px solid var(--red); box-shadow: 0 0 0 2px #000000;
+  font-size: 16px; text-shadow: 2px 2px 0 #3f1515; text-align: left;
+}
+
+/* ── дашборд ── */
+.topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 16px clamp(16px, 4vw, 36px); }
+.brand-mini { font-size: 24px; color: var(--text-yellow); text-shadow: 3px 3px 0 #3f3f15; }
+.top-right { display: flex; align-items: center; gap: 12px; }
+
+.pill {
+  display: inline-block; border-radius: 0; font-size: 16px; padding: 4px 12px;
+  background: #000000; border: 2px solid #666666; color: var(--text-muted); text-shadow: 2px 2px 0 #222222;
+}
+.pill.ok { color: var(--green); border-color: #2e8b32; }
+.pill.off { color: var(--red); border-color: #c62828; }
+
+.hero {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 20px 20px 120px;
+}
+.hero .eyebrow { color: var(--text-yellow); font-size: 16px; margin: 0 0 14px; text-shadow: 2px 2px 0 #3f3f15; }
+.hero h1 {
+  margin: 0; font-size: clamp(32px, 5vw, 48px); line-height: 1.15; font-weight: normal; color: #ffffff;
+  text-shadow: 4px 4px 0 #3f3f3f; max-width: 20ch;
+}
+.hero .sub { margin: 18px 0 28px; max-width: 50ch; color: #ffffff; font-size: 16px; text-shadow: 2px 2px 0 #2a2a2a; }
+.hero .cta { width: auto; padding: 12px 32px; }
+
+main#worlds-section {
+  max-width: 1200px; margin: 0 auto; padding: 40px clamp(16px, 4vw, 40px) 60px; color: var(--text);
+  background: #1c1c1c; border: 2px solid #000000; box-shadow: inset 2px 2px 0 #5a5a5a, inset -2px -2px 0 #262626;
+}
+.section-title { margin: 0 0 10px; font-size: 24px; font-weight: normal; color: #ffffff; text-shadow: 3px 3px 0 #3f3f3f; }
+.players-bar {
+  display: flex; align-items: center; gap: 10px; margin: 0 0 24px; flex-wrap: wrap;
+  color: var(--text-muted); text-shadow: 2px 2px 0 #2a2a2a; font-size: 16px;
+}
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+
+.card {
+  border-radius: 0; color: var(--text); background: #141414; border: 2px solid #000000;
+  box-shadow: inset 2px 2px 0 #4a4a4a, inset -2px -2px 0 #222222;
+  transition: transform 0.1s steps(2);
+}
+.card:hover { transform: translateY(-3px); }
+.logo { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; image-rendering: pixelated; background: #000000; border-bottom: 2px solid #000000; }
+.card-body { padding: 14px 16px 16px; }
+.card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.card h2 { margin: 0; font-size: 20px; font-weight: normal; color: #ffffff; text-shadow: 2px 2px 0 #3f3f3f; }
+.meta { margin: 4px 0 12px; font-size: 16px; color: var(--text-muted); text-shadow: 2px 2px 0 #222222; }
+.label { margin: 0 0 6px; font-size: 16px; color: var(--text-muted); text-shadow: 2px 2px 0 #222222; }
+.badge { display: inline-block; border-radius: 0; font-size: 16px; padding: 2px 8px; background: #000000; border: 2px solid #666666; text-shadow: 2px 2px 0 #222222; }
+.badge.open { color: var(--green); border-color: #2e8b32; }
+.badge.closed { color: var(--red); border-color: #c62828; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-block; border-radius: 0; font-size: 16px; padding: 2px 8px; background: #000000; border: 2px solid #555555; color: #e6e6e6; text-shadow: 2px 2px 0 #222222; }
+.players-bar .chip { color: var(--green); border-color: #2e8b32; }
+.chip.dim { color: #888888; }
+.muted { color: var(--text-muted); }
+.foot { text-align: center; margin-top: 32px; font-size: 16px; color: #aaaaaa; text-shadow: 2px 2px 0 #222222; }
+
+.hidden { display: none !important; }
+
+/* ── кнопки в шапке / подвале ── */
+.how-btn, .how-btn-link {
+  color: var(--text-link); text-decoration: underline; background: none; border: none;
+  font-family: var(--mc-font); font-size: 16px; cursor: pointer; text-shadow: 2px 2px 0 #153f3f;
+}
+.how-btn-link:hover { color: #ffffff; text-shadow: 2px 2px 0 #3f3f3f; }
+.connect-trigger-area { margin-top: 14px; text-align: center; }
+.dash-footer-connect { margin-top: 36px; text-align: center; }
+
+/* ── модальные окна (Minecraft Dialog) ── */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75);
+  display: flex; align-items: center; justify-content: center; z-index: 1000;
+  padding: 16px; backdrop-filter: blur(2px);
+}
+.modal-box {
+  width: min(600px, 100%); max-height: 90vh; overflow-y: auto;
+  background: #1c1c1c; border: 2px solid #000000;
+  box-shadow: inset 2px 2px 0 #5a5a5a, inset -2px -2px 0 #262626, 0 16px 40px rgba(0,0,0,0.85);
+  color: #ffffff; padding: 24px 26px; display: flex; flex-direction: column; gap: 16px;
+}
+.admin-modal-box { width: min(840px, 100%); }
+.modal-header {
+  display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000000;
+  padding-bottom: 12px;
+}
+.modal-header h2 { margin: 0; font-size: 24px; font-weight: normal; color: var(--text-yellow); text-shadow: 2px 2px 0 #3f3f15; }
+.modal-close-btn {
+  background: #737373; border-top: 2px solid #bebebe; border-left: 2px solid #bebebe;
+  border-right: 2px solid #373737; border-bottom: 2px solid #373737;
+  color: #ffffff; font-family: var(--mc-font); font-size: 16px; cursor: pointer; padding: 4px 10px;
+}
+.modal-close-btn:hover { background: #8b8b8b; color: var(--text-hover); }
+.modal-body { display: flex; flex-direction: column; gap: 14px; font-size: 16px; }
+.modal-intro { margin: 0; color: var(--text-muted); }
+.copy-box {
+  display: flex; align-items: center; gap: 8px; background: #000000;
+  border: 2px solid #a0a0a0; padding: 8px 12px; margin-top: 4px;
+}
+.copy-box code { flex: 1; font-family: var(--mc-font); font-size: 18px; color: #55ff55; word-break: break-all; }
+.copy-status { font-size: 14px; color: #55ff55; height: 18px; display: block; margin-top: 4px; }
+.connect-details-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;
+  background: #141414; border: 2px solid #000000; padding: 12px;
+}
+.detail-item { display: flex; justify-content: space-between; gap: 8px; font-size: 15px; }
+.detail-name { color: var(--text-muted); }
+.detail-val { color: #ffffff; }
+.connect-steps ol { margin: 8px 0; padding-left: 22px; line-height: 1.6; }
+.inline-code { background: #000000; border: 1px solid #555555; padding: 2px 6px; color: var(--text-yellow); }
+.whitelist-note { margin: 8px 0 0; color: #ffb86c; font-size: 14px; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 10px; border-top: 2px solid #000000; padding-top: 14px; }
+
+/* ── Админка (Tabs & Tables) ── */
+.admin-tabs { display: flex; gap: 4px; border-bottom: 2px solid #000000; padding-bottom: 2px; flex-wrap: wrap; }
+.admin-tab {
+  background: #373737; border: 2px solid #000000; border-bottom: none; color: #aaaaaa;
+  font-family: var(--mc-font); font-size: 15px; padding: 8px 16px; cursor: pointer;
+}
+.admin-tab:hover { background: #555555; color: #ffffff; }
+.admin-tab.active { background: #737373; color: var(--text-yellow); text-shadow: 1px 1px 0 #3f3f15; }
+.tab-pane { display: none; }
+.tab-pane.active { display: flex; flex-direction: column; gap: 16px; }
+.admin-section-box {
+  background: #141414; border: 2px solid #000000; padding: 16px;
+  box-shadow: inset 1px 1px 0 #373737, inset -1px -1px 0 #1a1a1a;
+}
+.admin-section-box h3 { margin: 0 0 6px; font-size: 18px; color: var(--text-yellow); text-shadow: 2px 2px 0 #3f3f15; font-weight: normal; }
+.invite-form-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; margin-top: 12px; }
+.input-col { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 160px; }
+.mc-input {
+  background: #000000; border: 2px solid #a0a0a0; color: #ffffff;
+  font-family: var(--mc-font); font-size: 15px; padding: 8px 10px; outline: none;
+}
+.mc-input:focus { border-color: #ffffff; }
+.mc-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 15px; }
+.mc-table th, .mc-table td { padding: 8px 10px; border: 1px solid #373737; }
+.mc-table th { background: #262626; color: var(--text-yellow); font-weight: normal; text-shadow: 1px 1px 0 #222; }
+.mc-table td { background: #0f0f0f; }
+.table-wrap { max-height: 240px; overflow-y: auto; border: 2px solid #000000; }
+.err-btn { border-color: #c62828 !important; color: #ff6b6b !important; }
+.toggle-row { display: flex; align-items: center; gap: 14px; margin-top: 10px; }
+.twofa-setup-area { margin-top: 14px; display: flex; flex-direction: column; gap: 12px; }
+.verify-row { display: flex; gap: 8px; align-items: center; margin-top: 6px; }
+.verify-input { max-width: 140px; font-size: 18px; letter-spacing: 2px; text-align: center; }
+.err-text { color: var(--red); font-size: 14px; margin-top: 4px; display: block; }
+
+/* ── Консоль (Minecraft Server Live Console) ── */
+.console-body {
+  margin: 0; min-height: 100vh; background: #14100d url('/static/dirt.png') top left / 96px 96px repeat;
+  image-rendering: pixelated; color: #ffffff; font-family: var(--mc-font);
+}
+.console-layout {
+  max-width: 1300px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column;
+  padding: 12px 16px; gap: 10px; box-sizing: border-box;
+}
+.console-header {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  background: #1c1c1c; border: 2px solid #000000; padding: 12px 18px;
+  box-shadow: inset 2px 2px 0 #5a5a5a, inset -2px -2px 0 #262626; flex-wrap: wrap;
+}
+.console-title-area { display: flex; align-items: center; gap: 12px; }
+.console-heading { margin: 0; font-size: 22px; font-weight: normal; color: #ffffff; text-shadow: 2px 2px 0 #3f3f3f; }
+.console-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.console-toolbar {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  background: #141414; border: 2px solid #000000; padding: 8px 14px; flex-wrap: wrap;
+}
+.toolbar-left, .toolbar-right { display: flex; align-items: center; gap: 10px; }
+.filter-input { width: 280px; }
+.toggle-label { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 15px; }
+.console-window {
+  flex: 1; min-height: 60vh; background: #000000; border: 2px solid #a0a0a0;
+  box-shadow: inset 2px 2px 0 #000000; overflow: hidden; display: flex;
+}
+.terminal-feed {
+  flex: 1; overflow-y: auto; padding: 12px 14px; font-family: var(--mc-font); font-size: 15px;
+  line-height: 1.45; white-space: pre-wrap; word-break: break-all;
+}
+.log-line { margin-bottom: 2px; }
+.log-info { color: #e0e0e0; }
+.log-warn { color: #ffff55; text-shadow: 1px 1px 0 #3f3f15; }
+.log-error { color: #ff5555; text-shadow: 1px 1px 0 #3f1515; }
+.log-cmd { color: #55ffff; }
+.log-chat { color: #ffaa00; }
+.console-command-bar {
+  background: #1c1c1c; border: 2px solid #000000; padding: 10px 14px;
+  box-shadow: inset 2px 2px 0 #5a5a5a, inset -2px -2px 0 #262626; display: flex; flex-direction: column; gap: 8px;
+}
+.cmd-form { display: flex; align-items: center; gap: 8px; }
+.cmd-prompt { font-size: 20px; color: #55ff55; font-weight: bold; }
+.cmd-input { flex: 1; font-size: 16px; padding: 10px 12px; }
+.cmd-submit { width: auto !important; padding: 10px 20px !important; margin: 0 !important; }
+.quick-commands { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 14px; }
+.quick-label { color: var(--text-muted); }
+.quick-chip {
+  background: #2b2b2b; border: 1px solid #555555; color: #55ffff;
+  font-family: var(--mc-font); font-size: 13px; padding: 2px 8px; cursor: pointer;
+}
+.quick-chip:hover { background: #3f3f3f; color: #ffffff; }
+
+/* ── Console Read-Only Banner ── */
+.readonly-banner {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  background: #141414; border: 2px solid #555555; padding: 10px 16px;
+  box-shadow: inset 1px 1px 0 #333333; flex-wrap: wrap;
+}
+.readonly-icon { font-size: 26px; }
+.readonly-text { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 220px; }
+.readonly-title { font-size: 16px; color: var(--text-yellow); text-shadow: 1px 1px 0 #3f3f15; }
+.readonly-sub { font-size: 13px; color: var(--text-muted); }
+
+/* ── Регистрация ── */
+.invite-banner {
+  background: #000000; border: 2px solid #55ff55; padding: 8px 12px;
+  margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
+}
+.invite-banner.admin { border-color: #ff5555; }
+.invite-label { color: var(--text-muted); font-size: 15px; }
+
+@media (max-width: 600px) {
+  .login-card { padding: 24px 18px; }
+  .login-card h1 { font-size: 24px; }
+  .hero { padding-bottom: 80px; }
+  .filter-input { width: 100%; }
+}
+

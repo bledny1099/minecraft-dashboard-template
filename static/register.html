@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="ru" data-title="title_register">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="description" content="Minecraft server registration">
+  <title>Register · Minecraft Server</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="stage login-stage">
+    <button class="ghost lang-float" type="button" data-lang-toggle aria-label="Language">EN</button>
+    <main class="login-card">
+      <p class="eyebrow" data-i18n="eyebrow">Minecraft Server</p>
+      <h1 data-i18n="reg_h">Create Account</h1>
+      <p class="muted" data-i18n="reg_sub">Join our private server community.</p>
+
+      <div id="invite-badge-box" class="invite-banner {{INVITE_CLASS}}">
+        <span class="invite-label" data-i18n="invite_type">Account Type:</span>
+        <strong id="invite-role-text">{{INVITE_ROLE_NAME}}</strong>
+      </div>
+
+      {{ERROR}}
+
+      <form method="post" action="/register" autocomplete="on">
+        <input type="hidden" name="csrf" value="{{CSRF}}">
+        <input type="hidden" name="invite" value="{{INVITE_CODE}}">
+
+        <label for="username" data-i18n="mc_nickname">Minecraft Nickname</label>
+        <input id="username" name="username" type="text" autocomplete="username" maxlength="24" pattern="^[a-zA-Z0-9_]{3,24}$" title="3-24 letters, numbers or underscore" required autofocus placeholder="YourInGameNick">
+
+        <label for="password" data-i18n="pass">Password</label>
+        <input id="password" name="password" type="password" autocomplete="new-password" minlength="6" maxlength="128" required placeholder="••••••••">
+
+        <label for="password_confirm" data-i18n="pass_confirm">Confirm Password</label>
+        <input id="password_confirm" name="password_confirm" type="password" autocomplete="new-password" minlength="6" maxlength="128" required placeholder="••••••••">
+
+        <button id="register-submit" class="cta" type="submit"><span data-i18n="register_btn">Register</span> <span aria-hidden="true">→</span></button>
+      </form>
+
+      <div class="login-footer">
+        <a href="/login" class="text-link" data-i18n="back_to_login">← Back to Sign in</a>
+      </div>
+
+      <div class="connect-trigger-area">
+        <button id="how-to-connect-btn" type="button" class="how-btn-link" data-i18n="how_to_connect">🎮 How to connect</button>
+      </div>
+    </main>
+  </div>
+
+  <!-- How to Connect Modal -->
+  <div id="connect-modal" class="modal-backdrop hidden" aria-hidden="true" role="dialog">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 data-i18n="connect_title">🎮 How to connect to server</h2>
+        <button id="modal-close" class="modal-close-btn" type="button">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-intro" data-i18n="connect_intro">Join our private Minecraft world directly from your Minecraft Java client:</p>
+        
+        <div class="connect-info-block">
+          <label class="info-label" data-i18n="server_addr">Server Address:</label>
+          <div class="copy-box">
+            <code id="server-ip-code">mc.dosimple.app</code>
+            <button id="copy-ip-btn" class="mc-btn small" type="button" data-i18n="copy_btn">📋 Copy</button>
+          </div>
+          <span id="copy-status" class="copy-status"></span>
+        </div>
+
+        <div class="connect-details-grid">
+          <div class="detail-item">
+            <span class="detail-name" data-i18n="port_label">Port:</span>
+            <span class="detail-val">25565 (Default)</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-name" data-i18n="direct_ip_label">Direct IP:</span>
+            <span class="detail-val">91.99.147.9:25565</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-name" data-i18n="version_label">Game Version:</span>
+            <span class="detail-val">Java Edition 1.16.5</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-name" data-i18n="prot_label">Protection:</span>
+            <span class="detail-val">Whitelist &amp; AuthMe</span>
+          </div>
+        </div>
+
+        <div class="connect-steps">
+          <h3 data-i18n="steps_heading">Quick Steps:</h3>
+          <ol>
+            <li data-i18n="step_1">Launch <strong>Minecraft Java Edition 1.16.5</strong>.</li>
+            <li data-i18n="step_2">Click <strong>Multiplayer</strong> &rarr; <strong>Direct Connection</strong> (or <strong>Add Server</strong>).</li>
+            <li data-i18n="step_3">Enter <code class="inline-code">mc.dosimple.app</code> into the server address.</li>
+            <li data-i18n="step_4">Click <strong>Join Server</strong>!</li>
+          </ol>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="modal-done" class="mc-btn cta" type="button" data-i18n="got_it">Got it! / Понятно</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/i18n.js" defer></script>
+  <script src="/static/login.js" defer></script>
+</body>
+</html>

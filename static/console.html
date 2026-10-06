@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ru" data-title="title_console">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="description" content="Minecraft live server console">
+  <title>Console · Minecraft Server</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="console-body">
+  <div class="console-layout">
+    <header class="console-header">
+      <div class="console-title-area">
+        <span class="brand-mini">Minecraft</span>
+        <h1 class="console-heading">Server Live Console</h1>
+        <span id="conn-status" class="pill ok">🟢 Live</span>
+        {{ROLE_BADGE}}
+      </div>
+      <div class="console-actions">
+        {{NAV_BUTTON}}
+        <button id="lang-btn" class="mc-btn ghost small" type="button" data-lang-toggle>EN</button>
+        <button id="how-to-connect-btn" class="mc-btn small how-btn" type="button">🎮 How to connect</button>
+      </div>
+    </header>
+
+    <div class="console-toolbar">
+      <div class="toolbar-left">
+        <label for="log-filter" class="filter-label">Filter:</label>
+        <input id="log-filter" type="text" placeholder="Search logs (e.g. WARN, player, error)..." class="mc-input filter-input">
+        <button id="clear-filter-btn" class="mc-btn ghost small" type="button">✕</button>
+      </div>
+      <div class="toolbar-right">
+        <label class="toggle-label">
+          <input id="autoscroll-toggle" type="checkbox" checked>
+          <span>Auto-scroll</span>
+        </label>
+        <button id="clear-btn" class="mc-btn ghost small" type="button">🧹 Clear</button>
+        <button id="pause-btn" class="mc-btn ghost small" type="button">⏸️ Pause</button>
+      </div>
+    </div>
+
+    <main class="console-window">
+      <div id="log-stream" class="terminal-feed" role="log" aria-live="polite"></div>
+    </main>
+
+    <footer class="console-command-bar">
+      {{COMMAND_BAR_CONTENT}}
+    </footer>
+  </div>
+
+  <!-- How to Connect Modal -->
+  <div id="connect-modal" class="modal-backdrop hidden" aria-hidden="true" role="dialog">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>🎮 How to connect to server</h2>
+        <button id="modal-close" class="modal-close-btn" type="button">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-intro">Join our private Minecraft world directly from your Minecraft Java client:</p>
+        
+        <div class="connect-info-block">
+          <label class="info-label">Server Address:</label>
+          <div class="copy-box">
+            <code id="server-ip-code">mc.dosimple.app</code>
+            <button id="copy-ip-btn" class="mc-btn small" type="button">📋 Copy</button>
+          </div>
+          <span id="copy-status" class="copy-status"></span>
+        </div>
+
+        <div class="connect-details-grid">
+          <div class="detail-item">
+            <span class="detail-name">Port:</span>
+            <span class="detail-val">25565 (Default)</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-name">Direct IP:</span>
+            <span class="detail-val">91.99.147.9:25565</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-name">Game Version:</span>
+            <span class="detail-val">Java Edition 1.16.5</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-name">Protection:</span>
+            <span class="detail-val">Whitelist &amp; AuthMe</span>
+          </div>
+        </div>
+
+        <div class="connect-steps">
+          <h3>Quick Steps:</h3>
+          <ol>
+            <li>Launch <strong>Minecraft Java Edition 1.16.5</strong>.</li>
+            <li>Click <strong>Multiplayer</strong> &rarr; <strong>Direct Connection</strong> (or <strong>Add Server</strong>).</li>
+            <li>Paste <code class="inline-code">mc.dosimple.app</code> into the server address.</li>
+            <li>Click <strong>Join Server</strong>!</li>
+          </ol>
+          <p class="whitelist-note">⚠️ <em>Note:</em> Server whitelist is strictly enforced. If your nickname is not yet on the whitelist, contact an admin to add you.</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="modal-done" class="mc-btn cta" type="button">Got it! / Понятно</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/i18n.js" defer></script>
+  <script src="/static/console.js" defer></script>
+</body>
+</html>

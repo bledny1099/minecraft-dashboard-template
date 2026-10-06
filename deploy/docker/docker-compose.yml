@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  minecraft-dashboard:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile
+    container_name: mc-dashboard
+    restart: unless-stopped
+    env_file:
+      - ../../.env
+    ports:
+      - "8095:8095"
+    volumes:
+      # Mount Minecraft server directory (read-only for logs & world discovery)
+      - /home/minecraft/server:/home/minecraft/server:ro
+      - dashboard_data:/app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  dashboard_data:
