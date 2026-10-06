@@ -199,11 +199,11 @@ def check_login_csrf(token: str, ip: str) -> bool:
 
 
 ERRORS = {
-    "e": ("err_bad", "Неверный логин или пароль"),
-    "l": ("err_lock", "Слишком много попыток. Подождите немного."),
-    "c": ("err_csrf", "Страница устарела. Войдите ещё раз."),
-    "inv": ("err_bad_invite", "Недействительная ссылка-приглашение."),
-    "reg_fail": ("err_reg", "Ошибка регистрации (пользователь уже существует?)."),
+    "e": ("err_bad", "Invalid username or password."),
+    "l": ("err_lock", "Too many attempts. Please wait a moment."),
+    "c": ("err_csrf", "Session expired. Please sign in again."),
+    "inv": ("err_bad_invite", "Invalid or expired invite link."),
+    "reg_fail": ("err_reg", "Registration failed (username already taken?)."),
 }
 
 
@@ -351,10 +351,10 @@ def render_console_page(role: str) -> str:
             '<div class="readonly-banner">\n'
             '        <span class="readonly-icon">👁️</span>\n'
             '        <div class="readonly-text">\n'
-            '          <strong class="readonly-title" data-i18n="readonly_title">Режим просмотра (Только чтение)</strong>\n'
-            '          <span class="readonly-sub" data-i18n="readonly_sub">Ввод команд отключен без авторизации администратора. Доступен только живой просмотр логов.</span>\n'
+            '          <strong class="readonly-title" data-i18n="readonly_title">View-Only Mode (Read-Only)</strong>\n'
+            '          <span class="readonly-sub" data-i18n="readonly_sub">Command execution is disabled without administrator credentials. Only live logs are streamed.</span>\n'
             '        </div>\n'
-            '        <a href="/login" class="mc-btn small cta" data-i18n="login_as_admin">🔑 Войти для управления</a>\n'
+            '        <a href="/login" class="mc-btn small cta" data-i18n="login_as_admin">🔑 Login to Manage</a>\n'
             '      </div>'
         )
     return (

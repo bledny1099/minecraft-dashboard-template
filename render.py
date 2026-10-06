@@ -1,6 +1,6 @@
-"""Рендер вида сверху из файлов мира (Anvil, MC 1.16.5) — логотип мира для дашборда.
+"""Top-down world renderer from Minecraft Anvil files (MC 1.16.5) — generates world icons for the dashboard.
 
-Только чтение. Игру запускать не нужно. Чистый Python (zlib/struct), без Pillow.
+Read-only inspection. Game does not need to be running. Pure Python (zlib/struct), zero Pillow dependency.
 """
 import gzip
 import hashlib
@@ -11,8 +11,8 @@ import zlib
 from pathlib import Path
 
 WORLD_ID_RE = re.compile(r"^[A-Za-z0-9_\-]{1,32}$")
-OUT = 384            # размер картинки, px
-SCAN = 10            # радиус сканирования вокруг спавна, чанков
+OUT = 384            # image dimensions in pixels
+SCAN = 10            # chunk scan radius around spawn
 BG = (13, 17, 23)
 
 COLORS = {
@@ -143,7 +143,7 @@ def _unpack(longs, bits, count):
 
 
 def _chunk_columns(level: dict):
-    """Возвращает список 256 (height, blockname) либо None, если чанк не готов."""
+    """Returns a list of 256 (height, blockname) or None if chunk is not ready."""
     if level.get("Status") != "full":
         return None
     hm = level.get("Heightmaps", {}).get("WORLD_SURFACE")
@@ -226,7 +226,7 @@ def _spawn(world_dir: Path):
 
 
 def render_world(base: Path, wid: str) -> bytes:
-    """PNG вида сверху вокруг спавна мира `wid` (папка base/wid). Бросает исключение при ошибке."""
+    """Top-down PNG around spawn of world `wid` (folder base/wid). Raises on error."""
     if not WORLD_ID_RE.match(wid):
         raise ValueError("bad world id")
     world_dir = (base / wid).resolve()
@@ -243,7 +243,7 @@ def render_world(base: Path, wid: str) -> bytes:
     if not region_dir.exists():
         return placeholder("nether" if wid.endswith("nether") else "end" if wid.endswith("end") else "x")
 
-    # В основном мире спавн теперь в невидимом лобби, а логотипом остаётся остров у 0,0.
+    # Center on (0, 0) or spawn coordinates
     sx, sz = (0, 0) if wid == "world" else _spawn(world_dir)
     ccx, ccz = sx >> 4, sz >> 4
     size = SCAN * 2 * 16
@@ -282,7 +282,7 @@ def render_world(base: Path, wid: str) -> bytes:
                 heights[pz][px] = y
                 colors[pz][px] = col
 
-    # bbox заполненных колонок
+    # Bounding box of populated block columns
     xs = [x for row in colors for x, c in enumerate(row) if c]
     zs = [z for z, row in enumerate(colors) if any(row)]
     if not xs:

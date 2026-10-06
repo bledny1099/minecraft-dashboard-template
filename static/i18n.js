@@ -92,7 +92,7 @@
       steps_heading: 'Quick Steps:',
       step_1: 'Launch Minecraft Java Edition 1.16.5.',
       step_2: 'Click Multiplayer → Direct Connection (or Add Server).',
-      step_3: 'Enter mc.dosimple.app into the server address.',
+      step_3: 'Enter the server address into the Server Address field.',
       step_4: 'Click Join Server!',
       whitelist_warn: '⚠️ Note: Server whitelist is strictly enforced. If you are not yet on the whitelist, contact an admin.',
       got_it: 'Got it! / Close',

@@ -30,8 +30,8 @@
       const p = pts[i];
       const x = p[0] * ca + p[2] * sa;
       const z = -p[0] * sa + p[2] * ca;
-      const depth = (z + 1) / 2;              // 0 — дальняя сторона, 1 — ближняя
-      const light = Math.max(0, (x * 0.4 - p[1] * 0.35 + 0.7)); // свет сверху-справа
+      const depth = (z + 1) / 2;              // 0 = far side, 1 = near side
+      const light = Math.max(0, (x * 0.4 - p[1] * 0.35 + 0.7)); // light from top-right
       const alpha = (0.12 + depth * 0.75) * Math.min(1, 0.35 + light);
       ctx.fillStyle = 'rgba(' + (70 + light * 90 | 0) + ',' + (200 + light * 40 | 0) + ',' + (130 + light * 40 | 0) + ',' + alpha.toFixed(3) + ')';
       const s = p[3] * (0.8 + depth * 0.9) * (size / 900);

@@ -68,7 +68,7 @@
     if (copyIpBtn && ipCode) {
       copyIpBtn.addEventListener('click', () => {
         navigator.clipboard.writeText(ipCode.textContent.trim()).then(() => {
-          copyStatus.textContent = '✅ Copied / Скопировано!';
+          copyStatus.textContent = '✅ Copied!';
           copyIpBtn.textContent = 'Copied!';
           setTimeout(() => {
             copyStatus.textContent = '';
