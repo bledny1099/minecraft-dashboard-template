@@ -493,12 +493,23 @@ async def console_stream(req: web.Request):
 
     log_path = SERVER_DIR / "logs" / "latest.log"
 
+    rcon_noise = (
+        "issued server command: /list",
+        "issued server command: list",
+        "Thread RCON Client",
+        "RCON Listener",
+        "Thread RCON",
+        "[RCON Client",
+    )
+
     try:
         if log_path.exists():
             with open(log_path, "r", encoding="utf-8", errors="replace") as f:
-                lines = f.readlines()[-120:]
+                lines = f.readlines()[-160:]
                 for line in lines:
                     msg = line.rstrip("\r\n")
+                    if any(p in msg for p in rcon_noise):
+                        continue
                     await resp.write(f"data: {msg}\n\n".encode("utf-8"))
     except Exception as e:
         await resp.write(f"data: [Console] Error reading log history: {e}\n\n".encode("utf-8"))
@@ -511,7 +522,8 @@ async def console_stream(req: web.Request):
                 line = f.readline()
                 if line:
                     msg = line.rstrip("\r\n")
-                    await resp.write(f"data: {msg}\n\n".encode("utf-8"))
+                    if not any(p in msg for p in rcon_noise):
+                        await resp.write(f"data: {msg}\n\n".encode("utf-8"))
                 else:
                     await asyncio.sleep(0.35)
 
@@ -885,12 +897,48 @@ def cached(key: str, ttl: float, fn):
     return val
 
 
+def _mc_ping(host="127.0.0.1", port=25565, timeout=1.5):
+    """Query Minecraft Java server status via standard Server List Ping protocol."""
+    import socket
+    import json
+    try:
+        with socket.create_connection((host, int(port)), timeout=timeout) as s:
+            s.settimeout(timeout)
+            host_b = host.encode('utf-8')
+            data = b'\x00\x2f' + bytes([len(host_b)]) + host_b + (int(port)).to_bytes(2, 'big') + b'\x01'
+            s.sendall(bytes([len(data)]) + data + b'\x01\x00')
+            resp = b''
+            while True:
+                chunk = s.recv(4096)
+                if not chunk:
+                    break
+                resp += chunk
+                if b'}' in resp:
+                    break
+            idx = resp.find(b'{')
+            if idx != -1:
+                js = json.loads(resp[idx:].decode('utf-8', errors='ignore'))
+                p_data = js.get("players", {})
+                online_count = p_data.get("online", 0)
+                sample = p_data.get("sample") or []
+                names = [p.get("name") for p in sample if p.get("name")]
+                return True, online_count, names
+    except Exception:
+        pass
+    return False, 0, []
+
+
 def _players():
+    ok, count, names = _mc_ping()
+    if ok and count == 0:
+        return True, []
+    if ok and names and len(names) >= count:
+        return True, names
+    # Only if players are active and sample omitted names, fallback to RCON
     try:
         out = rcon_exec("list", 4)
     except Exception:
-        return False, []
-    names = []
+        return ok, names
     if ":" in out:
         names = [p.strip() for p in out.split(":", 1)[1].split(",") if p.strip().replace("_", "").isalnum()]
     return True, names
@@ -903,7 +951,7 @@ async def api_state(req: web.Request):
     except Exception:
         logging.exception("db error")
         worlds, access = [], {}
-    online, players = await asyncio.to_thread(cached, "players", 8, _players)
+    online, players = await asyncio.to_thread(cached, "players", 15, _players)
     out = []
     is_viewer = (s.get("role") == "viewer")
     for wid, title, kind, is_open in worlds:

@@ -27,15 +27,86 @@
   let historyIndex = -1;
   const maxLines = 1000;
 
-  // Format log lines with color coding
+  // Authentic Minecraft Formatting & Color Palette (§0-§f)
+  const MC_COLORS = {
+    '0': '#000000',
+    '1': '#0000aa',
+    '2': '#00aa00',
+    '3': '#00aaaa',
+    '4': '#aa0000',
+    '5': '#aa00aa',
+    '6': '#ffaa00',
+    '7': '#aaaaaa',
+    '8': '#555555',
+    '9': '#5555ff',
+    'a': '#55ff55',
+    'b': '#55ffff',
+    'c': '#ff5555',
+    'd': '#ff55ff',
+    'e': '#ffff55',
+    'f': '#ffffff',
+  };
+
+  function parseFormattedContent(text) {
+    if (!text.includes('§') && !text.includes('\x1b')) {
+      return document.createTextNode(text);
+    }
+
+    const fragment = document.createDocumentFragment();
+    // Strip ANSI escape codes
+    const cleaned = text.replace(/\x1b\[[0-9;]*m/g, '');
+    const parts = cleaned.split(/(§[0-9a-fk-or])/gi);
+    let currentColor = null;
+    let isBold = false;
+    let isItalic = false;
+    let isUnderline = false;
+
+    for (const part of parts) {
+      if (!part) continue;
+      if (part.startsWith('§') && part.length === 2) {
+        const code = part.charAt(1).toLowerCase();
+        if (code in MC_COLORS) {
+          currentColor = MC_COLORS[code];
+        } else if (code === 'l') {
+          isBold = true;
+        } else if (code === 'o') {
+          isItalic = true;
+        } else if (code === 'n') {
+          isUnderline = true;
+        } else if (code === 'r') {
+          currentColor = null;
+          isBold = false;
+          isItalic = false;
+          isUnderline = false;
+        }
+      } else {
+        const span = document.createElement('span');
+        span.textContent = part;
+        if (currentColor) span.style.color = currentColor;
+        if (isBold) span.style.fontWeight = 'bold';
+        if (isItalic) span.style.fontStyle = 'italic';
+        if (isUnderline) span.style.textDecoration = 'underline';
+        fragment.appendChild(span);
+      }
+    }
+    return fragment;
+  }
+
+  // Format log lines with color coding & Minecraft text formatting
   function formatLogLine(rawText) {
     const div = document.createElement('div');
     div.className = 'log-line';
 
-    let text = rawText;
+    const text = String(rawText || '');
     let lineType = 'info';
 
-    if (text.includes('/WARN') || text.includes('WARN]:') || text.includes('WARNING:')) {
+    if (text.startsWith('[Console Input]')) {
+      lineType = 'cmd';
+    } else if (text.startsWith('[Command Output]')) {
+      lineType = 'info';
+    } else if (text.startsWith('[Command Error]') || text.startsWith('[Error')) {
+      lineType = 'error';
+    } else if (text.includes('/WARN') || text.includes('WARN]:') || text.includes('WARNING:')) {
       lineType = 'warn';
     } else if (text.includes('/ERROR') || text.includes('ERROR]:') || text.includes('Exception') || text.includes('Error')) {
       lineType = 'error';
@@ -46,9 +117,7 @@
     }
 
     div.classList.add('log-' + lineType);
-
-    // Escape HTML
-    div.textContent = text;
+    div.appendChild(parseFormattedContent(text));
 
     // Filter check
     const filterQuery = (logFilter.value || '').trim().toLowerCase();
@@ -62,11 +131,15 @@
   function appendLog(rawText) {
     if (isPaused) return;
 
-    const line = formatLogLine(rawText);
-    logStream.appendChild(line);
+    const lines = String(rawText || '').split(/\r?\n/);
+    for (const rawLine of lines) {
+      if (rawLine === '' && lines.length > 1) continue;
+      const line = formatLogLine(rawLine);
+      logStream.appendChild(line);
+    }
 
     // Trim old lines
-    if (logStream.children.length > maxLines) {
+    while (logStream.children.length > maxLines) {
       logStream.removeChild(logStream.firstChild);
     }
 
