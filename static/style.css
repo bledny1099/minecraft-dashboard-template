@@ -70,40 +70,96 @@ body {
 .login-card input:focus { border-color: #ffffff; }
 
 /* ── Minecraft Beveled Buttons ── */
-.cta, button.cta {
-  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-  width: 100%; padding: 12px 16px; cursor: pointer; margin-top: 8px;
-  font-family: var(--mc-font); font-size: 16px; text-decoration: none; border-radius: 0;
+.mc-btn,
+button.mc-btn,
+a.mc-btn,
+.cta,
+button.cta,
+a.cta,
+.ghost,
+button.ghost,
+a.ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-sizing: border-box;
+  font-family: var(--mc-font);
+  font-size: 16px;
+  line-height: 1;
+  text-decoration: none !important;
+  cursor: pointer;
+  border-radius: 0;
   background: var(--btn-bg);
-  border-top: 2px solid #bebebe; border-left: 2px solid #bebebe;
-  border-right: 2px solid #373737; border-bottom: 2px solid #373737;
-  box-shadow: inset 2px 2px 0 #ffffff, inset -2px -2px 0 #555555, 0 0 0 2px #000000;
-  color: #ffffff; text-shadow: 2px 2px 0 #3f3f3f;
+  border-top: 2px solid #bebebe;
+  border-left: 2px solid #bebebe;
+  border-right: 2px solid #373737;
+  border-bottom: 2px solid #373737;
+  box-shadow: inset 1px 1px 0 #ffffff, inset -1px -1px 0 #555555, 0 0 0 2px #000000;
+  color: #ffffff !important;
+  text-shadow: 2px 2px 0 #3f3f3f;
+  padding: 8px 16px;
+  vertical-align: middle;
+  outline: none;
 }
-.cta:hover, button.cta:hover {
+
+.mc-btn:visited,
+button.mc-btn:visited,
+a.mc-btn:visited,
+.cta:visited,
+button.cta:visited,
+a.cta:visited,
+.ghost:visited,
+button.ghost:visited,
+a.ghost:visited {
+  color: #ffffff !important;
+  text-decoration: none !important;
+}
+
+.mc-btn:hover,
+button.mc-btn:hover,
+a.mc-btn:hover,
+.cta:hover,
+button.cta:hover,
+a.cta:hover,
+.ghost:hover,
+button.ghost:hover,
+a.ghost:hover {
   background: var(--btn-hover);
-  border-top-color: #ffffff; border-left-color: #ffffff;
-  border-right-color: #4a4a4a; border-bottom-color: #4a4a4a;
-  box-shadow: inset 2px 2px 0 #ffffff, inset -2px -2px 0 #6b6b6b, 0 0 0 2px #ffffff;
-  color: var(--text-hover); text-shadow: 2px 2px 0 #3f3f20;
+  border-top-color: #ffffff;
+  border-left-color: #ffffff;
+  border-right-color: #4a4a4a;
+  border-bottom-color: #4a4a4a;
+  box-shadow: inset 1px 1px 0 #ffffff, inset -1px -1px 0 #6b6b6b, 0 0 0 2px #ffffff;
+  color: var(--text-hover) !important;
+  text-shadow: 2px 2px 0 #3f3f20;
 }
-.cta:active, button.cta:active {
+
+.mc-btn:active,
+button.mc-btn:active,
+a.mc-btn:active,
+.cta:active,
+button.cta:active,
+a.cta:active,
+.ghost:active,
+button.ghost:active,
+a.ghost:active {
   background: var(--btn-active);
-  border-top-color: #373737; border-left-color: #373737;
-  border-right-color: #bebebe; border-bottom-color: #bebebe;
+  border-top-color: #373737;
+  border-left-color: #373737;
+  border-right-color: #bebebe;
+  border-bottom-color: #bebebe;
   box-shadow: inset 2px 2px 0 #222222, 0 0 0 2px #000000;
 }
 
-button.ghost {
-  font-family: var(--mc-font); font-size: 16px; cursor: pointer; color: #ffffff; background: var(--btn-bg);
-  border-top: 2px solid #bebebe; border-left: 2px solid #bebebe;
-  border-right: 2px solid #373737; border-bottom: 2px solid #373737;
-  box-shadow: inset 1px 1px 0 #ffffff, inset -1px -1px 0 #555555, 0 0 0 2px #000000;
-  padding: 6px 14px; border-radius: 0; text-shadow: 2px 2px 0 #3f3f3f;
-}
-button.ghost:hover {
-  background: var(--btn-hover); color: var(--text-hover);
-  box-shadow: inset 1px 1px 0 #ffffff, inset -1px -1px 0 #6b6b6b, 0 0 0 2px #ffffff;
+.mc-btn.small,
+a.mc-btn.small,
+button.mc-btn.small,
+.ghost.small,
+button.ghost.small,
+a.ghost.small {
+  padding: 6px 12px;
+  font-size: 14px;
 }
 .lang-float { position: absolute; top: 18px; right: clamp(18px, 4vw, 32px); z-index: 2; }
 
@@ -197,14 +253,49 @@ main#worlds-section {
 
 .hidden { display: none !important; }
 
-/* ── Header / Footer Buttons ── */
-.how-btn, .how-btn-link {
+/* ── links ── */
+.how-btn-link {
   color: var(--text-link); text-decoration: underline; background: none; border: none;
   font-family: var(--mc-font); font-size: 16px; cursor: pointer; text-shadow: 2px 2px 0 #153f3f;
 }
 .how-btn-link:hover { color: #ffffff; text-shadow: 2px 2px 0 #3f3f3f; }
 .connect-trigger-area { margin-top: 14px; text-align: center; }
 .dash-footer-connect { margin-top: 36px; text-align: center; }
+
+/* ── Hero Actions & Footer Credit ── */
+.hero-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+.hero-actions .mc-btn,
+.hero-actions a.mc-btn,
+.hero-actions .cta,
+.hero-actions a.cta {
+  min-width: 170px;
+  padding: 12px 22px;
+  font-size: 16px;
+}
+
+.site-credit {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 15px;
+  color: var(--text-muted);
+  text-shadow: 2px 2px 0 #222222;
+}
+.site-credit a.credit-link {
+  color: var(--text-yellow);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-shadow: 2px 2px 0 #3f3f15;
+}
+.site-credit a.credit-link:hover {
+  color: #ffffff;
+}
 
 /* ── Modal Dialogs (Minecraft Dialog) ── */
 .modal-backdrop {

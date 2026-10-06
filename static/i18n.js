@@ -63,6 +63,7 @@
       badge_admin: '⚡ Админ (Полный доступ)',
       back_dash: '⬅️ Панель миров',
       nav_login: '🔑 Войти',
+      made_in_lab: 'Сделано в doSimple Lab',
     },
     en: {
       title_login: 'Sign in · Minecraft Worlds', title_dash: 'Worlds · Minecraft Dashboard',
@@ -126,6 +127,7 @@
       badge_admin: '⚡ Admin (Full Access)',
       back_dash: '⬅️ Worlds Dashboard',
       nav_login: '🔑 Sign In',
+      made_in_lab: 'Made in doSimple Lab',
     },
   };
 
