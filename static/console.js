@@ -120,7 +120,7 @@
 
   // Clear button
   clearBtn.addEventListener('click', () => {
-    logStream.innerHTML = '';
+    logStream.replaceChildren();
   });
 
   // Pause button
@@ -150,10 +150,16 @@
 
     appendLog('[Console Input] > ' + cmd);
 
+    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+    const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+
     try {
       const resp = await fetch('/api/console/cmd', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken,
+        },
         body: JSON.stringify({ cmd }),
       });
       const data = await resp.json();

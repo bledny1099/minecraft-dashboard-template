@@ -326,8 +326,10 @@ async def logout_post(req: web.Request):
 
 
 # ───────────── console & guest view ─────────────
-def render_console_page(role: str) -> str:
+def render_console_page(role: str, csrf_token: str = "") -> str:
     raw = page("console.html")
+    csrf_meta = f'<meta name="csrf-token" content="{csrf_token}">' if (role == "admin" and csrf_token) else ""
+    raw = raw.replace("{{CSRF_META}}", csrf_meta)
     if role == "admin":
         badge_html = '<span id="role-badge" class="pill ok" data-i18n="badge_admin">⚡ Admin (Full Access)</span>'
         nav_btn = '<a href="/" class="mc-btn ghost small" data-i18n="back_dash">⬅️ Dashboard</a>'
@@ -461,14 +463,21 @@ async def console_page(req: web.Request):
     s = get_session(req)
     if not s:
         raise web.HTTPFound("/login")
-    role = s.get("role", "viewer")
-    return web.Response(text=render_console_page(role), content_type="text/html")
+    if s.get("role") != "admin":
+        return web.Response(
+            text="<!doctype html><html><body style='background:#14100d;color:#ff5555;font-family:monospace;padding:40px;text-align:center;'>"
+                 "<h1>403 Forbidden</h1><p>Console access is restricted to administrators only.</p>"
+                 "<p><a href='/' style='color:#ffff55;'>Return to Dashboard</a></p></body></html>",
+            status=403,
+            content_type="text/html",
+        )
+    return web.Response(text=render_console_page("admin", s.get("csrf", "")), content_type="text/html")
 
 
 async def console_stream(req: web.Request):
     s = get_session(req)
-    if not s or s.get("role") not in ("admin", "viewer", "player"):
-        return web.Response(status=403, text="Forbidden")
+    if not s or s.get("role") != "admin":
+        return web.Response(status=403, text="Forbidden: Console access restricted to administrators")
 
     resp = web.StreamResponse(
         status=200,
@@ -522,10 +531,20 @@ async def console_cmd(req: web.Request):
             "error": "Forbidden: Read-only console. Login as administrator to execute commands."
         }, status=403)
 
+    csrf = req.headers.get("X-CSRF-Token", "")
+    if not csrf or not hmac.compare_digest(csrf, s.get("csrf", "")):
+        return web.json_response({"error": "Forbidden: Invalid or missing CSRF token"}, status=403)
+
     data = await req.json()
     cmd = str(data.get("cmd", "")).strip()
     if not cmd:
         return web.json_response({"error": "Empty command"}, status=400)
+
+    if "\n" in cmd or "\r" in cmd or "\x00" in cmd:
+        return web.json_response({"error": "Forbidden: Newlines and control characters are not allowed."}, status=400)
+
+    if len(cmd) > 256:
+        return web.json_response({"error": "Command too long (maximum 256 characters)."}, status=400)
 
     try:
         out = await asyncio.to_thread(rcon_exec, cmd, 8)
@@ -578,10 +597,12 @@ async def register_post(req: web.Request):
 
     if len(username) < 3 or len(username) > 24 or not re.match(r"^[A-Za-z0-9_]+$", username):
         return web.Response(text="Invalid username format. Use 3-24 letters/numbers/underscores.", status=400)
-    if len(password) < 6:
-        return web.Response(text="Password must be at least 6 characters long.", status=400)
     if password != confirm:
         return web.Response(text="Passwords do not match.", status=400)
+    if len(password) < 8:
+        return web.Response(text="Password must be at least 8 characters long.", status=400)
+    if len(password) > 128:
+        return web.Response(text="Password must not exceed 128 characters.", status=400)
 
     assigned_role = "player"
     if invite_code:
@@ -618,6 +639,10 @@ def require_admin(req: web.Request):
     s = get_session(req)
     if not s or s.get("role") != "admin":
         raise web.HTTPForbidden(text=json.dumps({"error": "Admin required"}), content_type="application/json")
+    if req.method in ("POST", "PUT", "DELETE", "PATCH"):
+        csrf = req.headers.get("X-CSRF-Token", "")
+        if not csrf or not hmac.compare_digest(csrf, s.get("csrf", "")):
+            raise web.HTTPForbidden(text=json.dumps({"error": "Forbidden: Invalid or missing CSRF token"}), content_type="application/json")
     return s
 
 
@@ -629,8 +654,15 @@ async def admin_get_invites(req: web.Request):
 async def admin_create_invite(req: web.Request):
     s = require_admin(req)
     data = await req.json()
-    role = data.get("role", "player")
-    max_uses = int(data.get("max_uses", 1))
+    role = str(data.get("role", "player")).strip()
+    if role not in ("player", "admin"):
+        return web.json_response({"error": "Invalid role. Allowed values: player, admin"}, status=400)
+    try:
+        max_uses = int(data.get("max_uses", 1))
+        if max_uses < 0 or max_uses > 1000:
+            max_uses = 1
+    except (ValueError, TypeError):
+        max_uses = 1
     code = db.create_invite(role=role, created_by=s.get("user", "admin"), max_uses=max_uses, days_valid=30)
     origin = f"{req.scheme}://{req.host}"
     link = f"{origin}/register?invite={code}"
@@ -640,7 +672,9 @@ async def admin_create_invite(req: web.Request):
 
 async def admin_delete_invite(req: web.Request):
     s = require_admin(req)
-    code = req.match_info["code"]
+    code = req.match_info.get("code", "")
+    if not re.match(r"^[a-zA-Z0-9_\-]{4,64}$", code):
+        return web.json_response({"error": "Invalid invite code format"}, status=400)
     db.delete_invite(code)
     db.log_audit("delete_invite", f"Deleted invite {code}", s.get("user", "admin"))
     return web.json_response({"ok": True})
@@ -738,9 +772,11 @@ async def admin_get_users(req: web.Request):
 
 async def admin_delete_user(req: web.Request):
     s = require_admin(req)
-    username = req.match_info["username"]
-    if username == s.get("user"):
-        return web.json_response({"error": "Cannot delete current user"}, status=400)
+    username = req.match_info.get("username", "")
+    if not re.match(r"^[a-zA-Z0-9_\-\.]{1,32}$", username):
+        return web.json_response({"error": "Invalid username format"}, status=400)
+    if username.lower() == s.get("user", "").lower():
+        return web.json_response({"error": "Cannot delete your own active administrator account"}, status=400)
     ok = db.delete_user(username)
     if ok:
         db.log_audit("delete_user", f"Deleted user {username}", s.get("user", "admin"))
@@ -765,7 +801,7 @@ async def admin_whitelist_add(req: web.Request):
     data = await req.json()
     player = str(data.get("player", "")).strip()
     if not player or not re.match(r"^[A-Za-z0-9_]{1,16}$", player):
-        return web.json_response({"error": "Invalid nickname"}, status=400)
+        return web.json_response({"error": "Invalid nickname (1-16 alphanumeric characters or underscores)"}, status=400)
 
     try:
         out = await asyncio.to_thread(rcon_exec, f"whitelist add {player}", 4)
@@ -779,8 +815,8 @@ async def admin_whitelist_remove(req: web.Request):
     s = require_admin(req)
     data = await req.json()
     player = str(data.get("player", "")).strip()
-    if not player:
-        return web.json_response({"error": "Invalid nickname"}, status=400)
+    if not player or not re.match(r"^[A-Za-z0-9_]{1,16}$", player):
+        return web.json_response({"error": "Invalid nickname (1-16 alphanumeric characters or underscores)"}, status=400)
 
     try:
         out = await asyncio.to_thread(rcon_exec, f"whitelist remove {player}", 4)
